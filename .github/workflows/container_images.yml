@@ -1,4 +1,4 @@
-name: Build and push container images
+name: Capture container images
 on:
   push:
   workflow_dispatch:
@@ -14,9 +14,8 @@ env:
   REGISTRY: ghcr.io/${{ github.repository_owner }}
 
 jobs:
-  build:
-    name: Build images
-    runs-on: ubuntu-latest
+  pull-push:
+    name: Pull and push images
 
     strategy:
       matrix:
@@ -28,6 +27,8 @@ jobs:
           - base_repo: postgres
             tag: 18-trixie
 
+    runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -35,38 +36,12 @@ jobs:
         id: gen-image-name
         run: |
           IMAGE_NAME=${{ matrix.base_repo }}
-          # avoid using same name as original image, otherwise, failing the build
-          IMAGE_NAME=my-${IMAGE_NAME##*/}
+          IMAGE_NAME=${IMAGE_NAME##*/}
           echo "IMAGE_NAME=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
 
-      - name: Install QEMU dependency
-        # for building image with arch different from host
+      - name: Pull image
         run: |
-          sudo apt-get update
-          sudo apt-get install -y qemu-user-static
-
-      - name: Build images ${{ matrix.base_repo }}:${{ matrix.tag }}
-        id: build-image
-        uses: redhat-actions/buildah-build@v2
-        with:
-          base-image: ${{ matrix.base_repo }}
-          image: ${{ steps.gen-image-name.outputs.IMAGE_NAME }}
-          tags: ${{ matrix.tag }}
-          archs: ${{ env.ARCHS }}
-          oci: true
-          labels: |
-            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}#${{ github.sha }}
-
-      - name: Echo outputs
-        run: |
-          echo "Image: ${{ steps.build-image.outputs.image }}"
-          echo "Tags: ${{ steps.build-image.outputs.tags }}"
-          echo "Tagged Image: ${{ steps.build-image.outputs.image-with-tag }}"
-
-      - name: Check manifest
-        run: |
-          set -x
-          buildah manifest inspect ${{ steps.build-image.outputs.image-with-tag }}
+          podman image pull --arch arm64 ${{ matrix.base_repo }}:${{ matrix.tag }}
 
       - name: Log in to the GitHub Container registry
         uses: redhat-actions/podman-login@v1
@@ -79,9 +54,9 @@ jobs:
         id: push-to-ghcr
         uses: redhat-actions/push-to-registry@v2
         with:
-          image: ${{ steps.build-image.outputs.image }}
-          tags: ${{ steps.build-image.outputs.tags }}
+          image: ${{ steps.gen-image-name.outputs.IMAGE_NAME }}
+          tags: ${{ matrix.tag }}
           registry: ${{ env.REGISTRY }}
-
+  
       - name: Print image URL
         run: echo "Image pushed to ${{ steps.push-to-ghcr.outputs.registry-paths }}"
