@@ -10,12 +10,12 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  ARCHS: amd64, arm64
   REGISTRY: ghcr.io/${{ github.repository_owner }}
 
 jobs:
-  pull-push:
-    name: Pull and push images
+
+  copy:
+    name: Copy images
 
     strategy:
       matrix:
@@ -27,7 +27,7 @@ jobs:
           - base_repo: postgres
             tag: 18-trixie
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest      
 
     steps:
       - uses: actions/checkout@v4
@@ -39,10 +39,6 @@ jobs:
           IMAGE_NAME=${IMAGE_NAME##*/}
           echo "IMAGE_NAME=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
 
-      - name: Pull image
-        run: |
-          podman image pull --arch arm64 ${{ matrix.base_repo }}:${{ matrix.tag }}
-
       - name: Log in to the GitHub Container registry
         uses: redhat-actions/podman-login@v1
         with:
@@ -50,13 +46,8 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push to GitHub Container Repository
-        id: push-to-ghcr
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: ${{ steps.gen-image-name.outputs.IMAGE_NAME }}
-          tags: ${{ matrix.tag }}
-          registry: ${{ env.REGISTRY }}
-  
-      - name: Print image URL
-        run: echo "Image pushed to ${{ steps.push-to-ghcr.outputs.registry-paths }}"
+      - name: Copy images
+        run: |
+          skopeo copy --multi-arch all \
+            docker://${{ matrix.base_repo }}:${{ matrix.tag }} \
+            docker://${{ env.REGISTRY }}/${{ steps.gen-image-name.outputs.IMAGE_NAME }}      
