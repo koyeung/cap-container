@@ -52,4 +52,4 @@ jobs:
         run: |
           skopeo copy --multi-arch all \
             docker://${{ matrix.base_repo }}:${{ matrix.tag }} \
-            docker://${{ env.REGISTRY }}/${{ steps.gen-image-name.outputs.IMAGE_NAME }}      
+            docker://${{ env.REGISTRY }}/${{ steps.gen-image-name.outputs.IMAGE_NAME }}:${{ matrix.tag }}      
