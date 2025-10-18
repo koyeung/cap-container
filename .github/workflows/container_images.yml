@@ -19,13 +19,15 @@ jobs:
 
     strategy:
       matrix:
-        base_repo: [alpine, debian, postgres]
+        base_repo: [alpine, debian, postgres, ubuntu]
         tag: [latest]
         include:
           - base_repo: debian
             tag: stable-slim
           - base_repo: postgres
             tag: 18-trixie
+          - base_repo: ubuntu
+            tag: rolling  # latest release regardless of LTS status
 
     runs-on: ubuntu-latest      
 
