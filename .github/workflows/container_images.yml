@@ -23,8 +23,6 @@ jobs:
         tag: [latest]
         include:
           - base_repo: debian
-            tag: trixie-slim
-          - base_repo: debian
             tag: stable-slim
           - base_repo: postgres
             tag: 18-trixie
