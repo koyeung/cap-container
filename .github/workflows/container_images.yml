@@ -19,7 +19,7 @@ jobs:
 
     strategy:
       matrix:
-        base_repo: [alpine, debian, postgres, ubuntu]
+        base_repo: [alpine, debian, postgres, python, ubuntu]
         tag: [latest]
         include:
           - base_repo: debian
@@ -28,6 +28,15 @@ jobs:
             tag: 18-trixie
           - base_repo: ubuntu
             tag: rolling  # latest release regardless of LTS status
+          - base_repo: python
+            tag: 3.14-alpine
+        exclude:
+          - base_repo: debian
+            tag: latest
+          - base_repo: ubuntu
+            tag: latest
+          - base_repo: python
+            tag: latest
 
     runs-on: ubuntu-latest      
 
