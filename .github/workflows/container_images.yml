@@ -30,6 +30,8 @@ jobs:
             tag: rolling  # latest release regardless of LTS status
           - base_repo: python
             tag: 3.14-alpine
+          - base_repo: python
+            tag: 3.13-alpine
         exclude:
           - base_repo: debian
             tag: latest
