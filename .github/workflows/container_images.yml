@@ -18,6 +18,7 @@ jobs:
     name: Copy images
 
     strategy:
+      max-parallel: 3
       matrix:
         base_repo: [alpine, debian, postgres, python, ubuntu]
         tag: [latest]
