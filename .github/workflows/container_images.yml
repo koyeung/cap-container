@@ -36,8 +36,6 @@ jobs:
         exclude:
           - base_repo: debian
             tag: latest
-          - base_repo: ubuntu
-            tag: latest
           - base_repo: python
             tag: latest
 
