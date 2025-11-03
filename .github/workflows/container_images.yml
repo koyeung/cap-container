@@ -4,19 +4,14 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "0 0 * * *" # daily
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
 env:
   REGISTRY: ghcr.io/${{ github.repository_owner }}
-
 jobs:
-
   copy:
     name: Copy images
-
     strategy:
       max-parallel: 3
       matrix:
@@ -28,7 +23,7 @@ jobs:
           - base_repo: postgres
             tag: 18-trixie
           - base_repo: ubuntu
-            tag: rolling  # latest release regardless of LTS status
+            tag: rolling # latest release regardless of LTS status
           - base_repo: python
             tag: 3.14-alpine
           - base_repo: python
@@ -38,28 +33,23 @@ jobs:
             tag: latest
           - base_repo: python
             tag: latest
-
-    runs-on: ubuntu-latest      
-
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Generate var IMAGE_NAME
         id: gen-image-name
         run: |
           IMAGE_NAME=${{ matrix.base_repo }}
           IMAGE_NAME=${IMAGE_NAME##*/}
           echo "IMAGE_NAME=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
-
       - name: Log in to the GitHub Container registry
         uses: redhat-actions/podman-login@v1
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Copy images
         run: |
           skopeo copy --multi-arch all \
             docker://${{ matrix.base_repo }}:${{ matrix.tag }} \
-            docker://${{ env.REGISTRY }}/${{ steps.gen-image-name.outputs.IMAGE_NAME }}:${{ matrix.tag }}      
+            docker://${{ env.REGISTRY }}/${{ steps.gen-image-name.outputs.IMAGE_NAME }}:${{ matrix.tag }}
