@@ -33,9 +33,14 @@ jobs:
             tag: latest
           - base_repo: python
             tag: latest
+    permissions:
+      contents: read
+      packages: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Generate var IMAGE_NAME
         id: gen-image-name
         run: |
@@ -43,7 +48,7 @@ jobs:
           IMAGE_NAME=${IMAGE_NAME##*/}
           echo "IMAGE_NAME=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
       - name: Log in to the GitHub Container registry
-        uses: redhat-actions/podman-login@v1
+        uses: redhat-actions/podman-login@4934294ad0449894bcd1e9f191899d7292469603 # v1.7
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -52,4 +57,6 @@ jobs:
         run: |
           skopeo copy --multi-arch all \
             docker://${{ matrix.base_repo }}:${{ matrix.tag }} \
-            docker://${{ env.REGISTRY }}/${{ steps.gen-image-name.outputs.IMAGE_NAME }}:${{ matrix.tag }}
+            docker://${REGISTRY}/${STEPS_GEN_IMAGE_NAME_OUTPUTS_IMAGE_NAME}:${{ matrix.tag }}
+        env:
+          STEPS_GEN_IMAGE_NAME_OUTPUTS_IMAGE_NAME: ${{ steps.gen-image-name.outputs.IMAGE_NAME }}
