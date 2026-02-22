@@ -29,16 +29,16 @@ repos:
         args: [--autofix]
       - id: trailing-whitespace
   - repo: https://github.com/google/yamlfmt
-    rev: v0.20.0
+    rev: v0.21.0
     hooks:
       - id: yamlfmt
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.10.1
+    rev: v4.13.8
     hooks:
       - id: commitizen
 
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: v1.19.0
+    rev: v1.22.0
     hooks:
       # Run the linter.
       - id: zizmor
