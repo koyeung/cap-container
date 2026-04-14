@@ -51,14 +51,14 @@ hooks = [
 
 [[repos]]
 repo = "https://github.com/commitizen-tools/commitizen"
-rev = "v4.13.8"
+rev = "v4.13.9"
 hooks = [
   { id = "commitizen" }
 ]
 
 [[repos]]
 repo = "https://github.com/zizmorcore/zizmor-pre-commit"
-rev = "v1.22.0"
+rev = "v1.23.1"
 hooks = [
   { id = "zizmor" }
 ]
