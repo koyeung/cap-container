@@ -37,10 +37,10 @@ hooks = [{ id = "yamllint", args = ["--strict"] }]
 
 [[repos]]
 repo = "https://github.com/commitizen-tools/commitizen"
-rev = "v4.13.9"
+rev = "v4.16.2"
 hooks = [{ id = "commitizen" }]
 
 [[repos]]
 repo = "https://github.com/zizmorcore/zizmor-pre-commit"
-rev = "v1.23.1"
+rev = "v1.25.2"
 hooks = [{ id = "zizmor" }]
